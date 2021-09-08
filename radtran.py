@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-LIBRADTRAN_PATH = '/home/nsteiner/libradtran'
+LIBRADTRAN_PATH = os.environ["LIBRADTRAN_DIR"]
 UVSPEC_PATH = os.path.join(LIBRADTRAN_PATH, './bin/uvspec')
 
 HEADER = ('lambda', 'edir', 'edn', 'eup', )
