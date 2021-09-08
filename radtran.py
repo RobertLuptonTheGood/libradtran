@@ -97,7 +97,7 @@ FLIR_SOLAR_TOA = {
     'source': ('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat')),
     'latitude': ('N', 66),
     'longitude': ('W', 140),
-    'time': (2014, 07, 06, 14, 00, 00),
+    'time': (2014,  7,  6, 14,  0,  0),
     'albedo': (0.88,),
     'output_user': HEADER,
     'rte_solver': ('sdisort',),
@@ -111,7 +111,7 @@ FLIR_THERMAL_TOA = {
     'source': ('thermal', os.path.join(LIBRADTRAN_PATH, 'examples/UVSPEC_LOWTRAN_THERMAL.TRANS')),
     'latitude': ('N', 66),
     'longitude': ('W', 140),
-    'time': (2014, 07, 06, 14, 00, 00),
+    'time': (2014,  7,  6, 14,  0,  0),
     'albedo': (0,),
     'umu': (1,),  # sensor at nadir
     'sur_temperature': (273.15, ),
@@ -126,7 +126,7 @@ FLIR_SOLAR_PROFILE = {
     'source': ('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat')),
     'latitude': ('N', 66),
     'longitude': ('W', 140),
-    'time': (2014, 07, 06, 14, 00, 00),
+    'time': (2014,  7,  6, 14,  0,  0),
     'albedo': (0.88,),
     'rte_solver': ('sdisort',),
     'wavelength': (3000.0, 5000.0),
@@ -139,7 +139,7 @@ FLIR_THERMAL = {
     'source': ('thermal', os.path.join(LIBRADTRAN_PATH, 'examples/UVSPEC_LOWTRAN_THERMAL.TRANS')),
     'latitude': ('N', 66),
     'longitude': ('W', 140),
-    'time': (2014, 07, 06, 14, 00, 00),
+    'time': (2014,  7,  6, 14,  0,  0),
     'albedo': (.9, ),
     'output_user': ('lambda', 'edir', 'edn', 'eup', ),
     'rte_solver': ('disort',),
@@ -154,7 +154,7 @@ FLIR_SOLAR = {
     'source': ('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat')),
     'latitude': ('N', 66),
     'longitude': ('W', 140),
-    'time': (2014, 07, 06, 14, 00, 00),
+    'time': (2014,  7,  6, 14,  0,  0),
     'albedo': (.9, ),
     'output_user': ('lambda', 'edir', 'edn', 'eup', 'uu'),
     'rte_solver': ('disort',),
@@ -211,7 +211,7 @@ def write_input(input_definition, pipe, verbose=True, silent=False):
     if not silent:
         print(bcolors.HEADER + '\n**** Input file start ****' + bcolors.ENDC)
     ct = 1
-    for key, values in input_definition.iteritems():
+    for key, values in input_definition.items():
         input_line = '{} {}\n'.format(key, ' '.join([str(v) for v in values]))
         pipe.write(input_line)
         if not silent:
@@ -225,7 +225,7 @@ def write_input(input_definition, pipe, verbose=True, silent=False):
 
 def run_radtran(model_definition, silent=False):
     p1 = sp.Popen(UVSPEC_PATH, stdout=sp.PIPE, stdin=sp.PIPE, stderr=sp.PIPE,
-                  env={'LIBRADTRAN_DATA_FILES': os.path.join(LIBRADTRAN_PATH, 'data')})
+                  env={'DYLD_LIBRARY_PATH':os.environ["DYLD_LIBRARY_PATH"], 'LIBRADTRAN_DATA_FILES': os.path.join(LIBRADTRAN_PATH, 'data')}, text=True)
     write_input(model_definition, p1.stdin, silent=silent)
     return p1.communicate()
 
@@ -367,11 +367,11 @@ def radtran_basic(input_dict, verbose=False, silent=False):
 def radtran_thermal_transmittance(zout, emiss=1, verbose=False, silent=True):
     albedo = 1 - emiss
     input_dict = {
-         'atmosphere_file': ('/home/nsteiner/libradtran/data/atmmod/afglus.dat',),
+         'atmosphere_file': (os.path.join(LIBRADTRAN_PATH, 'data/atmmod/afglus.dat'),),
          'mol_abs_param': ('LOWTRAN',),
          'rte_solver': ('disort',),
          'wavelength_grid_file': ('//home/nsteiner/workspace/flir/out/testh', ),
-         'source': ('thermal', '/home/nsteiner/libradtran/examples/UVSPEC_LOWTRAN_THERMAL.TRANS'),
+         'source': ('thermal', os.path.join(LIBRADTRAN_PATH, 'examples/UVSPEC_LOWTRAN_THERMAL.TRANS')),
          'sur_temperature': (293, ),
 
          'umu': (1, ),
@@ -390,11 +390,11 @@ def radtran_thermal_transmittance(zout, emiss=1, verbose=False, silent=True):
 def radtran_solar_input(zout, latitude, longitude, datetime_obj, emiss=1, verbose=False, silent=True):
     albedo = 1 - emiss
     input_dict = {
-         'atmosphere_file': ('/home/nsteiner/libradtran/data/atmmod/afglus.dat',),
+         'atmosphere_file': (os.path.join(LIBRADTRAN_PATH, 'data/atmmod/afglus.dat'),),
          'mol_abs_param': ('LOWTRAN',),
          'rte_solver': ('disort',),
          'wavelength_grid_file': ('//home/nsteiner/workspace/flir/out/testh', ),
-         'source': ('solar', '/home/nsteiner/libradtran/data/solar_flux/kurudz_1.0nm.dat', 'per_nm'),
+         'source': ('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat', 'per_nm')),
          'sur_temperature': (293, ),
          'umu': (1, ),
          'output_process': ('integrate', ),
@@ -427,7 +427,7 @@ def radtran(input_dict=FLIR_SOLAR, pickle_file='solar'):
     return
 
 BASE_CONFIG = {
-     'atmosphere_file': ('/home/nsteiner/libradtran/data/atmmod/afglus.dat',),
+     'atmosphere_file': (os.path.join(LIBRADTRAN_PATH, 'data/atmmod/afglus.dat'),),
      'mol_abs_param': ('LOWTRAN', ),
      'rte_solver': ('disort', ),
      'zout': (.1, ),
@@ -443,7 +443,7 @@ BASE_CONFIG = {
 def radtran_full(label='', verbose=False, silent=True, base_config=BASE_CONFIG, **kwargs):
     solar_opt = base_config.copy()
     solar_opt.update(albedo=(1, ),
-                     source=('solar', '/home/nsteiner/libradtran/data/solar_flux/kurudz_1.0nm.dat', 'per_nm'),
+                     source=('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat'), 'per_nm'),
                      **kwargs)
     solar_rad = radtran_basic(solar_opt, verbose=verbose, silent=silent)
     thermal_opt = base_config.copy()
@@ -490,7 +490,7 @@ def run_surtemp_sensitivity(steps=5, minmax=(260, 300), sza_deg=60):
 
 def integrated_radtran_full(label='', verbose=False, silent=True, **kwargs):
     rad_ = {
-         'atmosphere_file': ('/home/nsteiner/libradtran/data/atmmod/afglus.dat',),
+         'atmosphere_file': (os.path.join(LIBRADTRAN_PATH, 'data/atmmod/afglus.dat'),),
          'mol_abs_param': ('LOWTRAN', ),
          'rte_solver': ('disort', ),
          'zout': (.1, ),
@@ -503,7 +503,7 @@ def integrated_radtran_full(label='', verbose=False, silent=True, **kwargs):
          'output_user': ('lambda', 'uu')}
     solar_opt = rad_.copy()
     solar_opt.update(albedo=(1, ),
-                     source=('solar', '/home/nsteiner/libradtran/data/solar_flux/kurudz_1.0nm.dat', 'per_nm'),
+                     source=('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat'), 'per_nm'),
                      **kwargs)
     solar_ = radtran.radtran_basic(solar_opt, verbose=verbose, silent=silent)
     thermal_opt = rad_.copy()
@@ -529,14 +529,14 @@ if __name__ == '__main__':
     '''
     h = (3000.0, 5000.0)
     surf_temp = 330
-    solar_source = ('solar', '/home/nsteiner/libradtran/data/solar_flux/kurudz_1.0nm.dat')
+    solar_source = ('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat'))
     solar_solver = 'disort'
     solar_albedo = .8
-    thermal_source = ('thermal', '/home/nsteiner/libradtran/examples/UVSPEC_LOWTRAN_THERMAL.TRANS')
+    thermal_source = ('thermal', os.path.join(LIBRADTRAN_PATH, 'examples/UVSPEC_LOWTRAN_THERMAL.TRANS'))
     thermal_solver = 'disort'
     solar_ = radtran_basic(
         {'albedo': (solar_albedo,),
-         'atmosphere_file': ('/home/nsteiner/libradtran/data/atmmod/afglus.dat',),
+         'atmosphere_file': (os.path.join(LIBRADTRAN_PATH, 'data/atmmod/afglus.dat'),),
          'mol_abs_param': ('LOWTRAN',),
          'rte_solver': (solar_solver,),
          'source': solar_source,
@@ -551,13 +551,13 @@ if __name__ == '__main__':
 
     tau_0 = transmittance(
         {'albedo': (.9,),
-         'atmosphere_file': ('/home/nsteiner/libradtran/data/atmmod/afglus.dat',),
+         'atmosphere_file': (os.path.join(LIBRADTRAN_PATH, 'data/atmmod/afglus.dat'),),
          'latitude': ('N', 66),
          'longitude': ('W', 140),
          'mol_abs_param': ('LOWTRAN',),
          'output_user': ('lambda', 'edir', 'edn', 'eup', 'uu'),
          'rte_solver': ('disort',),
-         'source': ('solar', '/home/nsteiner/libradtran/data/solar_flux/kurudz_1.0nm.dat'),
+         'source': ('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat')),
          'sur_temperature': (333.15, ),
          'time': (2014, 7, 6, 14, 0, 0),
          'output_quantity': ('transmittance',),
@@ -566,13 +566,13 @@ if __name__ == '__main__':
 
     tau_1 = transmittance(
         {'albedo': (.8,),
-         'atmosphere_file': ('/home/nsteiner/libradtran/data/atmmod/afglus.dat',),
+         'atmosphere_file': (os.path.join(LIBRADTRAN_PATH, 'data/atmmod/afglus.dat'),),
          'latitude': ('N', 66),
          'longitude': ('W', 140),
          'mol_abs_param': ('LOWTRAN',),
          'output_user': ('lambda', 'edir', 'edn', 'eup', 'uu'),
          'rte_solver': ('disort',),
-         'source': ('solar', '/home/nsteiner/libradtran/data/solar_flux/kurudz_1.0nm.dat'),
+         'source': ('solar', os.path.join(LIBRADTRAN_PATH, 'data/solar_flux/kurudz_1.0nm.dat')),
          'sur_temperature': (333.15, ),
          'time': (2014, 7, 6, 14, 0, 0),
          'output_quantity': ('transmittance',),
